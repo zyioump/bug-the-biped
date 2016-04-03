@@ -17,67 +17,66 @@ const int amplitudeBackDeg = 25;
 const int amplitudeFrontDeg = 8;
 const int stoper [2] = {0,0};
 const int avancer [nbrPos][2] = {
-  {-amplitudeFrontDeg, amplitudeBackDeg},
-  {amplitudeFrontDeg, -amplitudeBackDeg}
+    {-amplitudeFrontDeg, amplitudeBackDeg},
+    {amplitudeFrontDeg, -amplitudeBackDeg}
 };
 const int reculer [nbrPos][2] = {
-  {-amplitudeFrontDeg, -amplitudeBackDeg},
-  {amplitudeFrontDeg, amplitudeBackDeg}
+    {-amplitudeFrontDeg, -amplitudeBackDeg},
+    {amplitudeFrontDeg, amplitudeBackDeg}
 };
 const int droite [nbrPos][2] = {
-  {-amplitudeFrontDeg + 20 , amplitudeBackDeg - 20},
-  {amplitudeFrontDeg, -amplitudeBackDeg}
+    {-amplitudeFrontDeg + 20 , amplitudeBackDeg - 20},
+    {amplitudeFrontDeg, -amplitudeBackDeg}
 };
 const int gauche [3][2] = {
-  {-amplitudeFrontDeg - 20  , amplitudeBackDeg + 80},
-  {-amplitudeFrontDeg - 10  , amplitudeBackDeg },
-  {amplitudeFrontDeg, -amplitudeBackDeg}
+    {-amplitudeFrontDeg - 20  , amplitudeBackDeg + 80},
+    {-amplitudeFrontDeg - 10  , amplitudeBackDeg },
+    {amplitudeFrontDeg, -amplitudeBackDeg}
 };
 
 void setup() {
-  // put your setup code here, to run once:
-  MF.attach(2);  //Front motor
-  MB.attach(4);  //Back motor
+    // put your setup code here, to run once:
+    MF.attach(2);  //Front motor
+    MB.attach(4);  //Back motor
 
-  MF.write(hm[0], speed_, true);
-  MB.write(hm[1], speed_, true);
-  Serial.begin(115200);
+    MF.write(hm[0], speed_, true);
+    MB.write(hm[1], speed_, true);
+    Serial.begin(115200);
 }
 
 void loop() {
-  // put your main code here, to run repeatedly:
-  int d = distance();
-  if(d < 10){
-    robotReculer();
-    while(d < 12){
-      d = distance();
-      robotTournerAGauche();
+    // put your main code here, to run repeatedly:
+    int d = distance();
+    if(d < 10){
+        while(d < 12){
+            d = distance();
+            robotReculer();
+        }
+        while(d < 15){
+            d = distance();
+            robotTournerAGauche();
+        }
     }
-    while(d < 15){
-      d = distance();
-      robotTournerAGauche();
+    else{
+        robotAvancer();
     }
-  }
-  else{
-    robotAvancer();
-  }
 }
 
 unsigned int distance()
 {
-  unsigned int duration, distance;
-  delayMicroseconds(40);
+    unsigned int duration, distance;
+    delayMicroseconds(40);
 
-  duration = sonar.ping();
-  
-  // Distance proportionnelle à la durée de sortie
-  distance = duration/US_ROUNDTRIP_CM;
-  Serial.print(duration);
-  Serial.print(" ");
-  Serial.println(distance);
-  if(distance > 40 || distance < 3)
-    return 25;  
-  return distance;
+    duration = sonar.ping();
+
+    // Distance proportionnelle à la durée de sortie
+    distance = duration/US_ROUNDTRIP_CM;
+    Serial.print(duration);
+    Serial.print(" ");
+    Serial.println(distance);
+    if(distance > 40 || distance < 3)
+        return 25;  
+    return distance;
 }
 
 void bouger(const int pos[])
@@ -93,16 +92,16 @@ void robotStop()
 
 void robotAvancer()
 {
-  for(int x=0; x<nbrPos; x++){
-    bouger(avancer[x]);
-  }
+    for(int x=0; x<nbrPos; x++){
+        bouger(avancer[x]);
+    }
 }
 
 void robotReculer()
 {
-  for(int x=0; x<nbrPos; x++){
-    bouger(reculer[x]);
-  }
+    for(int x=0; x<nbrPos; x++){
+        bouger(reculer[x]);
+    }
 }
 
 void robotTournerAGauche()
@@ -113,7 +112,7 @@ void robotTournerAGauche()
     MF.slowmove(hm[0] + amplitudeFrontDeg, 100);
     MB.slowmove(80, 150);
     delay(250);
-  
+
 }
 
 void robotTournerADroite()
