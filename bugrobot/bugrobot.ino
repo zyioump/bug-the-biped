@@ -5,7 +5,7 @@ VarSpeedServo MB;
 
 const int ultrasonPin = 6;
 
-const int hm[2] = {90, 90}; // Home position, you need to set them
+const int hm[2] = {80, 95}; // Home position, you need to set them {FRONT,BACK}
 const int speed_ = 30; // Slow speed
 
 const int nbrPos = 2;
@@ -43,6 +43,17 @@ void setup() {
 void loop() {
   // put your main code here, to run repeatedly:
   Serial.println(distance());
+    robotAvancer();  
+  if(distance()<20){
+    robotStop();
+    for(int i=0;i<5;i++){
+        robotReculer();    
+    }
+    for(int j=0;j<50;j++){
+        robotTournerADroite();    
+    }
+  }
+  
   /*if(d < 10){
     robotReculer();
     while(d < 20){
