@@ -1,11 +1,15 @@
+#include <NewPing.h>
 #include <VarSpeedServo.h>
+
 
 VarSpeedServo MF;
 VarSpeedServo MB;
 
 const int ultrasonPin = 6;
 
-const int hm[2] = {90, 90}; // Home position, you need to set them
+NewPing sonar(ultrasonPin, ultrasonPin );
+
+const int hm[2] = {81, 95}; // Home position, you need to set them
 const int speed_ = 30; // Slow speed
 
 const int nbrPos = 2;
@@ -35,63 +39,62 @@ void setup() {
   MF.attach(2);  //Front motor
   MB.attach(4);  //Back motor
 
-  MF.slowmove(hm[0], speed_);
-  MB.slowmove(hm[1], speed_);
-  Serial.begin(9600);
+  MF.write(hm[0], speed_, true);
+  MB.write(hm[1], speed_, true);
+  Serial.begin(115200);
 }
 
 void loop() {
   // put your main code here, to run repeatedly:
-  Serial.println(distance());
-  /*if(d < 10){
+  int d = distance();
+  if(d < 10){
     robotReculer();
-    while(d < 20){
+    while(d < 12){
+      d = distance();
+      robotTournerAGauche();
+    }
+    while(d < 15){
+      d = distance();
       robotTournerAGauche();
     }
   }
   else{
     robotAvancer();
-  }*/
+  }
 }
 
-int distance()
+unsigned int distance()
 {
-  long duration, distance;
-  pinMode(ultrasonPin, OUTPUT);
+  unsigned int duration, distance;
+  delayMicroseconds(40);
 
-  digitalWrite(ultrasonPin, LOW); 
-  delayMicroseconds(2);
-  digitalWrite(ultrasonPin, HIGH);
-  delayMicroseconds(10); //Trig déclenché 10ms sur HIGH
-  digitalWrite(ultrasonPin, LOW);
- 
-  // Calcul de l'écho
-  pinMode(ultrasonPin, INPUT);
-  duration = pulseIn(ultrasonPin, HIGH);
+  duration = sonar.ping();
   
   // Distance proportionnelle à la durée de sortie
-  distance = duration*340/(2*10000);  //Vitesse du son théorique
-  
+  distance = duration/US_ROUNDTRIP_CM;
+  Serial.print(duration);
+  Serial.print(" ");
+  Serial.println(distance);
+  if(distance > 40 || distance < 3)
+    return 25;  
   return distance;
 }
 
 void bouger(const int pos[])
 {
-    MF.slowmove(hm[0] + pos[0], speed_);
-    MB.slowmove(hm[1] + pos[1], speed_);
+    MF.write(hm[0] + pos[0], speed_, true);
+    MB.write(hm[1] + pos[1], speed_, true);
 }
 
 void robotStop()
 {
     bouger(stoper);
-    delay(450);
 }
 
 void robotAvancer()
 {
   for(int x=0; x<nbrPos; x++){
     bouger(avancer[x]);
-    delay(450);
   }
 }
 
@@ -99,7 +102,6 @@ void robotReculer()
 {
   for(int x=0; x<nbrPos; x++){
     bouger(reculer[x]);
-    delay(450);
   }
 }
 
