@@ -4,19 +4,19 @@
 
 #define BUFF_SIZE 256
 
-SoftwareSerial monB(7, 9);
+SoftwareSerial monB(9, 12);
 
 VarSpeedServo MF;
 VarSpeedServo MB;
 
-const int ultrasonPin = 6;
+const int ultrasonPin = 8;
 
 NewPing sonar(ultrasonPin, ultrasonPin );
 
-const int hm[2] = {81, 95}; // Home position, you need to set them
+const int hm[2] = {90, 90}; // Home position, you need to set them
 const int speed_ = 30; // Slow speed
 
-char c ;
+char c = 'U';
 
 const int nbrPos = 2;
 const int amplitudeBackDeg = 25;
@@ -42,8 +42,8 @@ const int gauche [3][2] = {
 
 void setup() {
     // put your setup code here, to run once:
-    MF.attach(2);  //Front motor
-    MB.attach(4);  //Back motor
+    MF.attach(4);  //Front motor
+    MB.attach(6);  //Back motor
 
   // Ouvre la voie série avec le module BT
     monB.begin(9600);
@@ -81,7 +81,28 @@ void bluetooth() {
     case 'S':
       robotStop();
       break;
+    case 'U':
+      ultrason();
+      break;
   }
+}
+
+void ultrason(){
+   // put your main code here, to run repeatedly:
+    int d = distance();
+    if(d < 10){
+        while(d < 12){
+            d = distance();
+            robotReculer();
+        }
+        while(d < 20){
+            d = distance();
+            robotTournerAGauche();
+        }
+    }
+    else{
+        robotAvancer();
+    }
 }
 
 unsigned int distance()
